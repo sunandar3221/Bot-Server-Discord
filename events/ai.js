@@ -8,8 +8,8 @@ const CONFIG = {
     channelId: '1258029219628187791', 
 
     // 2. Cloudflare Credentials
-    cfAccountId: 'PLACEHOLDER',
-    cfApiToken: 'PLACEHOLDER',
+    cfAccountId: process.env.CLOUDFLARE_ACCOUNT_ID || 'PLACEHOLDER',
+    cfApiToken: process.env.CLOUDFLARE_API_TOKEN || 'PLACEHOLDER',
     
     // 3. Model AI
     cfModel: '@cf/openai/gpt-oss-20b',
@@ -60,8 +60,8 @@ module.exports = {
         const userId = message.author.id;
         const userUsage = db.users[userId] || 0;
 
-        const isAdmin = message.member.permissions.has(PermissionFlagsBits.Administrator);
-        const isBooster = message.member.premiumSinceTimestamp !== null;
+        const isAdmin = Boolean(message.member?.permissions?.has(PermissionFlagsBits.Administrator));
+        const isBooster = Boolean(message.member?.premiumSinceTimestamp);
 
         if (!isAdmin) {
             const limit = isBooster ? CONFIG.limitBooster : CONFIG.limitMember;

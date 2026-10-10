@@ -15,12 +15,15 @@ module.exports = {
         }
 
         // Hapus pesan
-        await interaction.channel.bulkDelete(amount, true).catch(err => {
-            console.error(err);
-            return interaction.reply({ content: 'Gagal menghapus pesan (Pesan mungkin lebih tua dari 14 hari).', ephemeral: true });
-        });
-
-        return interaction.reply({ content: `🧹 Berhasil menghapus **${amount}** pesan.`, ephemeral: true });
+        try {
+            const deleted = await interaction.channel.bulkDelete(amount, true);
+            return interaction.reply({ content: `🧹 Berhasil menghapus **${deleted.size}** pesan.`, ephemeral: true });
+        } catch (err) {
+            console.error('Clear error:', err);
+            if (!interaction.replied) {
+                return interaction.reply({ content: 'Gagal menghapus pesan (Pesan mungkin lebih tua dari 14 hari atau bot kurang izin).', ephemeral: true });
+            }
+        }
     },
 };
 

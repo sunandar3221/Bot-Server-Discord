@@ -15,16 +15,27 @@ module.exports = {
 
         try {
             // Ambil data invite yang baru sekarang
-            const newInvites = await member.guild.invites.fetch();
+            const newInvites = await member.guild.invites.fetch().catch(() => null);
+            if (!newInvites) return;
             
             // Ambil data invite yang lama dari cache
+            if (!client.invites) client.invites = new Map();
             const oldInvites = client.invites.get(member.guild.id);
 
             // Cari tau invite mana yang jumlah 'uses' nya nambah
-            const inviteUsed = newInvites.find(i => {
-                const uses = oldInvites.get(i.code);
+            let inviteUsed = oldInvites ? newInvites.find(i => {
+                const uses = oldInvites.get(i.code) || 0;
                 return uses < i.uses;
-            });
+            }) : null;
+
+            // Handle invite sekali pakai yang langsung hangus
+            if (!inviteUsed && oldInvites) {
+                oldInvites.forEach((oldUses, code) => {
+                    if (!newInvites.has(code)) {
+                        inviteUsed = { code, inviter: null, uses: oldUses + 1, isSingleUse: true };
+                    }
+                });
+            }
 
             // Update cache-nya biar valid buat member selanjutnya yang join
             client.invites.set(member.guild.id, new Map(newInvites.map((invite) => [invite.code, invite.uses])));
@@ -34,7 +45,11 @@ module.exports = {
             let usesText = '?';
 
             if (inviteUsed) {
-                inviterText = `<@${inviteUsed.inviter.id}>`;
+                if (inviteUsed.inviter) {
+                    inviterText = `<@${inviteUsed.inviter.id}>`;
+                } else if (inviteUsed.isSingleUse) {
+                    inviterText = `Single-use Invite (\`${inviteUsed.code}\`)`;
+                }
                 usesText = inviteUsed.uses;
             }
 

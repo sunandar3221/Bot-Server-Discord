@@ -91,10 +91,16 @@ if (fs.existsSync(eventsPath)) {
         const filePath = path.join(eventsPath, file);
         try {
             const event = require(filePath);
-            if (event.once) {
-                client.once(event.name, (...args) => event.execute(...args));
+            if (event && event.name && typeof event.execute === 'function') {
+                if (event.once) {
+                    client.once(event.name, (...args) => event.execute(...args));
+                } else {
+                    client.on(event.name, (...args) => event.execute(...args));
+                }
+            } else if (typeof event === 'function') {
+                event(client);
             } else {
-                client.on(event.name, (...args) => event.execute(...args));
+                console.log(`[WARNING] Event di ${file} kurang properti 'name' atau 'execute'.`);
             }
         } catch (err) {
             console.error(`[ERROR] Gagal load event ${file}:`, err);
@@ -103,8 +109,12 @@ if (fs.existsSync(eventsPath)) {
 }
 
 // --- 3. FUNGSI DEPLOY ---
-const rest = new REST().setToken(process.env.TOKEN);
 async function deployCommands() {
+    if (!process.env.TOKEN || !process.env.CLIENT_ID || process.env.TOKEN === 'TOKEN_BOT_KAMU') {
+        console.warn('⚠️ Token atau Client ID belum diatur di .env. Deploy command dilewati.');
+        return;
+    }
+    const rest = new REST().setToken(process.env.TOKEN);
     try {
         console.log(`⏳ Refreshing ${commandsArray.length} slash commands...`);
         await rest.put(
@@ -137,6 +147,22 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
-client.login(process.env.TOKEN);
+// Penanganan error global agar bot tidak crash tiba-tiba
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+if (process.env.TOKEN && process.env.TOKEN !== 'TOKEN_BOT_KAMU') {
+    client.login(process.env.TOKEN).catch(err => {
+        console.error('❌ Gagal login ke Discord:', err.message);
+    });
+} else {
+    console.log('⚠️ TOKEN di .env masih berupa placeholder. Masukkan token bot Discord Anda di file .env untuk online.');
+}
+
 startOAuthServer();
 

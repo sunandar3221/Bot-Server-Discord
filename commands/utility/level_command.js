@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '../levels.json');
+const DB_PATH = path.join(__dirname, '../../levels.json');
 
 module.exports = {
     data: new SlashCommandBuilder()

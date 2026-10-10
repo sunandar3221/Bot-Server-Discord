@@ -16,13 +16,22 @@ module.exports = {
             }
         }
 
+        if (reaction.message.partial) {
+            try {
+                await reaction.message.fetch();
+            } catch (error) {
+                console.error('Gagal fetch message partial:', error);
+                return;
+            }
+        }
+
         const message = reaction.message;
         
         // Kita ambil client langsung dari object message, biar gak error "client not defined"
         const client = message.client; 
 
         // Cek apakah pesan ini buatan bot kita dan punya embed
-        if (message.author.id !== client.user.id) return;
+        if (!message.author || message.author.id !== client.user.id) return;
         if (message.embeds.length === 0) return;
 
         // Cek Footer Embed buat nyari ID Role

@@ -57,8 +57,14 @@ module.exports = {
         const normalizedContent = normalizeText(rawContent);
 
         // 2. Cek apakah ada kata kasar di teks yang udah bersih
-        // Kita pakai .some() buat cek satu-satu apakah kata kasar ada di dalam teks
-        const foundBadWord = badWordsList.find(word => normalizedContent.includes(word));
+        // Untuk kata pendek (<= 3 huruf seperti 'asu'), cek per-kata agar tidak false alarm (contoh: 'pas ujian')
+        const words = rawContent.toLowerCase().split(/\s+/).map(w => normalizeText(w));
+        const foundBadWord = badWordsList.find(word => {
+            if (word.length <= 3) {
+                return words.includes(word);
+            }
+            return normalizedContent.includes(word);
+        });
 
         if (foundBadWord) {
             // Hapus pesan user

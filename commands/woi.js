@@ -69,10 +69,7 @@ module.exports = {
             const guild = interaction.guild;
             const owner = await guild.fetchOwner();
 
-            // 3. Simpan ID user ke database SEKARANG agar tidak bisa spam command
-            saveUserToDatabase(userId);
-
-            // 4. Siapkan Embed untuk Owner
+            // 3. Siapkan Embed untuk Owner
             const embedOwner = new EmbedBuilder()
                 .setTitle('📩 Permintaan Beta Tester Baru')
                 .setColor('Blue')
@@ -83,7 +80,7 @@ module.exports = {
                 )
                 .setFooter({ text: 'Klik tombol di bawah untuk memutuskan.' });
 
-            // 5. Siapkan Tombol (Accept / Decline)
+            // 4. Siapkan Tombol (Accept / Decline)
             const buttons = new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()
@@ -98,12 +95,15 @@ module.exports = {
                         .setEmoji('⛔')
                 );
 
-            // 6. Kirim DM ke Owner
+            // 5. Kirim DM ke Owner
             const ownerMessage = await owner.send({ 
                 content: `Halo Owner, ada permintaan baru dari server **${guild.name}**.`,
                 embeds: [embedOwner], 
                 components: [buttons] 
             });
+
+            // Simpan ID user ke database setelah DM ke Owner sukses terkirim
+            saveUserToDatabase(userId);
 
             // Beritahu user bahwa permintaan terkirim
             await interaction.editReply({ 

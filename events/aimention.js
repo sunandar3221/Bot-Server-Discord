@@ -33,7 +33,7 @@ module.exports = {
         // 3. CEK JATAH KUOTA
         const userId = message.author.id;
         const member = message.member; 
-        const isAdmin = member?.permissions.has(PermissionsBitField.Flags.Administrator);
+        const isAdmin = Boolean(member?.permissions?.has(PermissionsBitField.Flags.Administrator));
         
         if (!isAdmin) {
             const today = new Date().toISOString().split('T')[0]; 
@@ -44,7 +44,7 @@ module.exports = {
                 userUsage.set(userId, userData);
             }
 
-            const isBooster = member?.premiumSinceTimestamp !== null;
+            const isBooster = Boolean(member?.premiumSinceTimestamp);
             const limit = isBooster ? QUOTA.BOOSTER : QUOTA.REGULAR;
 
             if (userData.count >= limit) {

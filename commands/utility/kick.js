@@ -9,7 +9,11 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
     async execute(interaction) {
         const targetUser = interaction.options.getUser('target');
-        const member = await interaction.guild.members.fetch(targetUser.id);
+        const member = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
+
+        if (!member) {
+            return interaction.reply({ content: '❌ Member tidak ditemukan di dalam server.', ephemeral: true });
+        }
 
         // Cek apakah bot bisa kick member tersebut (role hierarchy)
         if (!member.kickable) {

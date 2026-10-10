@@ -16,11 +16,20 @@ module.exports = {
             }
         }
 
+        if (reaction.message.partial) {
+            try {
+                await reaction.message.fetch();
+            } catch (error) {
+                console.error('Gagal fetch pesan partial:', error);
+                return;
+            }
+        }
+
         const message = reaction.message;
         const client = message.client; // Ambil client dari sini
 
         // Cek apakah pesan ini buatan bot kita
-        if (message.author.id !== client.user.id) return;
+        if (!message.author || message.author.id !== client.user.id) return;
         if (message.embeds.length === 0) return;
 
         const footerText = message.embeds[0].footer?.text;

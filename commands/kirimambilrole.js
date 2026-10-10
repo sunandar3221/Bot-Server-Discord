@@ -42,8 +42,8 @@ module.exports = {
         }
 
         // Validasi Permission Bot
-        const botMember = interaction.guild.members.cache.get(interaction.client.user.id);
-        if (role.position >= botMember.roles.highest.position) {
+        const botMember = interaction.guild.members.me || await interaction.guild.members.fetchMe().catch(() => null);
+        if (!botMember || role.position >= botMember.roles.highest.position) {
             return interaction.editReply({ content: 'Waduh, aku gak bisa ngasih role itu karena posisinya lebih tinggi atau sama dengan role aku.' });
         }
 

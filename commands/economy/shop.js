@@ -3,7 +3,17 @@ const fs = require('fs');
 const path = require('path');
 
 const dbPath = path.join(__dirname, '../../economy.json');
-const loadDb = () => JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+const loadDb = () => {
+    if (!fs.existsSync(dbPath)) {
+        fs.writeFileSync(dbPath, JSON.stringify({}));
+        return {};
+    }
+    try {
+        return JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+    } catch {
+        return {};
+    }
+};
 const saveDb = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
 // Daftar Barang

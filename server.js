@@ -4,20 +4,20 @@ const axios = require('axios');
 // ==========================================
 // 🛠️ CONFIG: WAJIB LU ISI BAGIAN SINI BRO!
 // ==========================================
-const CLIENT_ID = 'CLIENT_ID_KAMU'; 
-const CLIENT_SECRET = 'CLIENT_SECRET_KAMU'; 
+const CLIENT_ID = process.env.CLIENT_ID || 'CLIENT_ID_KAMU'; 
+const CLIENT_SECRET = process.env.CLIENT_SECRET || 'CLIENT_SECRET_KAMU'; 
 
 // 👇 UDAH GW GANTI JADI DOMAIN LU
-const REDIRECT_URI = 'DOMAIN_WEBSITE';
+const REDIRECT_URI = process.env.REDIRECT_URI || 'DOMAIN_WEBSITE';
 
-const GUILD_ID = 'GUILD_ID_KALIAN';
-const VERIFIED_ROLE_ID = 'ROLE_ID';
-const UNVERIFIED_ROLE_ID = 'ROLE_ID';
-const BOT_TOKEN = 'TOKEN_BOT'; 
+const GUILD_ID = process.env.GUILD_ID || 'GUILD_ID_KALIAN';
+const VERIFIED_ROLE_ID = process.env.VERIFIED_ROLE_ID || 'ROLE_ID';
+const UNVERIFIED_ROLE_ID = process.env.UNVERIFIED_ROLE_ID || 'ROLE_ID';
+const BOT_TOKEN = process.env.TOKEN || process.env.BOT_TOKEN || 'TOKEN_BOT'; 
 
 // 🛡️ CONFIG CAPTCHA
-const RECAPTCHA_SITE_KEY = 'CAPTCHA';
-const RECAPTCHA_SECRET_KEY = 'CAPTCHA';
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || 'CAPTCHA';
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || 'CAPTCHA';
 
 // ==========================================
 // 🎨 TEMPLATE HTML (HALAMAN UTAMA / LANDING PAGE)
@@ -689,10 +689,16 @@ function startOAuthServer() {
         }
     });
 
-    const PORT = process.env.PORT || PORT_KALIAN; 
-    app.listen(PORT, () => {
-        console.log(`[🌐] Server OAuth2 Web jalan di port ${PORT} ngab!`);
-    });
+    const PORT = process.env.PORT || 3000; 
+    try {
+        app.listen(PORT, () => {
+            console.log(`[🌐] Server OAuth2 Web jalan di port ${PORT} ngab!`);
+        }).on('error', (err) => {
+            console.error(`[🌐 ERROR] Gagal menjalankan OAuth2 Server di port ${PORT}:`, err.message);
+        });
+    } catch (err) {
+        console.error('[🌐 ERROR] Server OAuth gagal dimulai:', err);
+    }
 }
 
 module.exports = startOAuthServer;

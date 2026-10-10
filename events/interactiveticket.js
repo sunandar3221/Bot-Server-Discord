@@ -156,7 +156,9 @@ module.exports = {
             }
 
             // --- Lock channel untuk pembuat tiket ---
-            const creatorId = channel.topic ? channel.topic.split('Ticket User ID: ')[1].split(' |')[0] : null;
+            const creatorId = (channel.topic && channel.topic.includes('Ticket User ID: ')) 
+                ? channel.topic.split('Ticket User ID: ')[1].split(' |')[0].trim() 
+                : null;
 
             if (creatorId) {
                 await channel.permissionOverwrites.edit(creatorId, {

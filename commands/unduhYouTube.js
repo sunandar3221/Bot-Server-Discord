@@ -145,14 +145,14 @@ module.exports = {
                     await interactionUpdate.editReply({ content: `<@${interaction.user.id}>, ${pesanSukses}`, files: [attachment] });
                 }
 
-                // Bersih-bersih sampah file temporary
-                if (fs.existsSync(m4aPath)) fs.unlinkSync(m4aPath);
-                if (fs.existsSync(mp3Path)) fs.unlinkSync(mp3Path);
-                if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
-
             } catch (error) {
                 console.error("\n[ERROR DOWNLOAD]:", error.message);
                 await interactionUpdate.editReply({ content: 'Waduh error bro pas nyoba ambil atau convert datanya. Coba lagi nanti yak.', components: []});
+            } finally {
+                // Bersih-bersih sampah file temporary di exit apapun
+                try { if (fs.existsSync(m4aPath)) fs.unlinkSync(m4aPath); } catch {}
+                try { if (fs.existsSync(mp3Path)) fs.unlinkSync(mp3Path); } catch {}
+                try { if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath); } catch {}
             }
 
             // ==========================================
